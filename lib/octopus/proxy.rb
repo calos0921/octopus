@@ -76,6 +76,19 @@ module Octopus
       connection_pool.connection
     end
 
+    alias_method :safe_connection_without_fork_check, :safe_connection
+
+    def safe_connection_with_fork_check(connection_pool)
+      retries ||= 0
+      safe_connection_without_fork_check(connection_pool)
+    rescue NoMethodError
+      ActiveRecord::Base.establish_connection
+      ActiveRecord::Base.connection.initialize_shards(Octopus.config)
+      retry if (retries += 1) < 2
+    end
+
+    alias_method :safe_connection, :safe_connection_with_fork_check
+
     def select_connection
       safe_connection(shards[shard_name])
     end
@@ -170,7 +183,11 @@ module Octopus
     end
 
     def connected?
+      retries ||= 0
       shards.any? { |_k, v| v.connected? }
+    rescue NoMethodError
+      proxy_config.reinitialize_shards
+      retry if (retries += 1) < 2
     end
 
     def should_send_queries_to_shard_slave_group?(method)
@@ -192,15 +209,15 @@ module Octopus
     def current_model_replicated?
       replicated && (current_model.try(:replicated) || fully_replicated?)
     end
-    
+
     def initialize_schema_migrations_table
       if Octopus.atleast_rails52?
         select_connection.transaction { ActiveRecord::SchemaMigration.create_table }
-      else 
+      else
         select_connection.initialize_schema_migrations_table
       end
     end
-    
+
     def initialize_metadata_table
       select_connection.transaction { ActiveRecord::InternalMetadata.create_table }
     end
