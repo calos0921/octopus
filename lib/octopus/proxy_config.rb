@@ -205,8 +205,9 @@ module Octopus
         @fully_replicated = true
       end
 
-      @slaves_list = shards.keys.map(&:to_s).sort
-      @slaves_list.delete('master')
+      #@slaves_list = shards.keys.map(&:to_s).sort
+      #@slaves_list.delete('master')
+      @slaves_list = @shards.keys.map(&:to_s).delete_if{|x| x =~ /^log_|master/ }.sort
       @slaves_load_balancer = Octopus.load_balancer.new(@slaves_list)
     end
 
