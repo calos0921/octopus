@@ -49,9 +49,9 @@ module Octopus
         return ::Octopus::ScopeProxy.new(current_shard, result)
       end
 
-      if result.respond_to?(:current_shard)
-        result.current_shard = current_shard
-      end
+      # if result.respond_to?(:current_shard)
+      #   result.current_shard = current_shard
+      # end
 
       result
     end
