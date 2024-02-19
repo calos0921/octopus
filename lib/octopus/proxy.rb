@@ -70,7 +70,7 @@ module Octopus
     # reconnect, but in Rails 3.1 the flag prevents this.
     def safe_connection(connection_pool)
       connection_pool.automatic_reconnect ||= true
-      if !connection_pool.connected? && shards[Octopus.master_shard].connection.query_cache_enabled
+      if !connection_pool.connected? && shards[current_shard].connection.query_cache_enabled
         connection_pool.connection.enable_query_cache!
       end
       connection_pool.connection
@@ -361,7 +361,11 @@ module Octopus
         end
         yield
       ensure
-        self.current_shard = older_shard
+        if older_shard == :log_readonly
+          self.current_shard = Octopus.master_shard
+        else
+          self.current_shard = older_shard
+        end
         self.current_slave_group = older_slave_group
         self.current_load_balance_options = older_load_balance_options
       end
