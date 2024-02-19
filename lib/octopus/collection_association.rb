@@ -1,7 +1,7 @@
 module Octopus
   module CollectionAssociation
     def self.included(base)
-      if Octopus.atleast_rails52?
+      if Octopus.atleast_rails52? || Octopus.atleast_rails61?
         base.sharded_methods :reader, :writer, :ids_reader, :ids_writer, :create, :create!,
                              :build, :include?,
                              :load_target, :reload, :size, :select
