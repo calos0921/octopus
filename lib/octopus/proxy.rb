@@ -253,7 +253,8 @@ module Octopus
     def with_each_healthy_shard
       shards.each do |shard_name, v|
         begin
-          yield(v)
+          active_connection = v.active_connection? rescue false
+          yield(v) if active_connection
         rescue => e
           if Octopus.robust_environment?
             Octopus.logger.error "Error on shard #{shard_name}: #{e.message}"
