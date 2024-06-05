@@ -72,6 +72,8 @@ module Octopus
       connection_pool.automatic_reconnect ||= true
       if !connection_pool.connected? && shards[Octopus.master_shard].connection.query_cache_enabled
         connection_pool.connection.enable_query_cache!
+      elsif defined?(PhusionPassenger) && shards[Octopus.master_shard].connection.query_cache_enabled
+        connection_pool.connection.enable_query_cache!
       end
       connection_pool.connection
     end
