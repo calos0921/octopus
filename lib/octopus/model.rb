@@ -130,6 +130,11 @@ If you are trying to scope everything to a specific shard, use Octopus.using ins
             self.custom_octopus_table_name = true
             super
           end
+
+          def clear_on_handler(handler)
+            self.connection.shards['master'].connection.clear_query_cache
+            super
+          end
         end
       end
 
