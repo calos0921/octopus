@@ -132,7 +132,7 @@ If you are trying to scope everything to a specific shard, use Octopus.using ins
           end
 
           def clear_on_handler(handler)
-            self.connection.shards&.dig('master')&.connection&.clear_query_cache
+            self.connection.shards&.dig('master')&.connection&.clear_query_cache if self.connection&.respond_to?(:shards)
             super
           end
         end
