@@ -16,8 +16,12 @@ module Octopus
       @ar_relation = ar_relation
     end
 
-    def respond_to?(*args)
-      method_missing(:respond_to?, *args)
+    def respond_to?(*args, **kwargs)
+      if kwargs.empty?
+        method_missing(:respond_to?, *args)
+      else
+        method_missing(:respond_to?, *args, **kwargs)
+      end
     end
 
     # methods redefined in ActiveRecord that should run_on_shard
@@ -29,27 +33,53 @@ module Octopus
     BATCH_METHODS = [:find_each, :find_in_batches, :in_batches]
     WHERE_CHAIN_METHODS = [:not]
 
-    def method_missing(method, *args, &block)
+    def method_missing(method, *args, **kwargs, &block)
       if !block && BATCH_METHODS.include?(method)
         ::Enumerator.new do |yielder|
           run_on_shard do
-            @ar_relation.public_send(method, *args) do |batch_item|
-              yielder << batch_item
+            if kwargs.empty?
+              @ar_relation.public_send(method, *args) do |batch_item|
+                yielder << batch_item
+              end
+            else
+              @ar_relation.public_send(method, *args, **kwargs) do |batch_item|
+                yielder << batch_item
+              end
             end
           end
         end
       elsif ENUM_METHODS.include?(method) || block && ENUM_WITH_BLOCK_METHODS.include?(method)
-        run_on_shard { @ar_relation.to_a }.public_send(method, *args, &block)
+        if kwargs.empty?
+          run_on_shard { @ar_relation.to_a }.public_send(method, *args, &block)
+        else
+          run_on_shard { @ar_relation.to_a }.public_send(method, *args, **kwargs, &block)
+        end
       elsif WHERE_CHAIN_METHODS.include?(method)
-        ::Octopus::ScopeProxy.new(@current_shard, run_on_shard { @ar_relation.public_send(method, *args) } )
+        if kwargs.empty?
+          ::Octopus::ScopeProxy.new(@current_shard, run_on_shard { @ar_relation.public_send(method, *args) } )
+        else
+          ::Octopus::ScopeProxy.new(@current_shard, run_on_shard { @ar_relation.public_send(method, *args, **kwargs) } )
+        end
       elsif block
-        @ar_relation.public_send(method, *args, &block)
+        if kwargs.empty?
+          @ar_relation.public_send(method, *args, &block)
+        else
+          @ar_relation.public_send(method, *args, **kwargs, &block)
+        end
       else
         run_on_shard do
           if method == :load_records
-            @ar_relation.send(method, *args)
+            if kwargs.empty?
+              @ar_relation.send(method, *args)
+            else
+              @ar_relation.send(method, *args, **kwargs)
+            end
           else
-            @ar_relation.public_send(method, *args)
+            if kwargs.empty?
+              @ar_relation.public_send(method, *args)
+            else
+              @ar_relation.public_send(method, *args, **kwargs)
+            end
           end
         end
       end

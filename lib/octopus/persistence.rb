@@ -1,19 +1,38 @@
 module Octopus
   module Persistence
-    def update_attribute(*args)
-      run_on_shard { super }
+    def update_attribute(*args, **kwargs)
+      run_on_shard { super(*args, **kwargs) }
     end
 
-    def update_attributes(*args)
-      run_on_shard { super }
+    # For Rails 6.1+, update_attributes has been removed, so we alias it to update
+    if defined?(ActiveRecord) && ActiveRecord::VERSION::MAJOR >= 6 && ActiveRecord::VERSION::MINOR >= 1
+      def update_attributes(*args, **kwargs)
+        run_on_shard { update(*args, **kwargs) }
+      end
+
+      def update_attributes!(*args, **kwargs)
+        run_on_shard { update!(*args, **kwargs) }
+      end
+    else
+      def update_attributes(*args, **kwargs)
+        run_on_shard { super(*args, **kwargs) }
+      end
+
+      def update_attributes!(*args, **kwargs)
+        run_on_shard { super(*args, **kwargs) }
+      end
     end
 
-    def update_attributes!(*args)
-      run_on_shard { super }
+    def update(*args, **kwargs)
+      run_on_shard { super(*args, **kwargs) }
     end
 
-    def reload(*args)
-      run_on_shard { super }
+    def update!(*args, **kwargs)
+      run_on_shard { super(*args, **kwargs) }
+    end
+
+    def reload(*args, **kwargs)
+      run_on_shard { super(*args, **kwargs) }
     end
 
     def delete
@@ -24,20 +43,20 @@ module Octopus
       run_on_shard { super }
     end
 
-    def touch(*args)
-      run_on_shard { super }
+    def touch(*args, **kwargs)
+      run_on_shard { super(*args, **kwargs) }
     end
 
-    def update_column(*args)
-      run_on_shard { super }
+    def update_column(*args, **kwargs)
+      run_on_shard { super(*args, **kwargs) }
     end
 
-    def increment!(*args)
-      run_on_shard { super }
+    def increment!(*args, **kwargs)
+      run_on_shard { super(*args, **kwargs) }
     end
 
-    def decrement!(*args)
-      run_on_shard { super }
+    def decrement!(*args, **kwargs)
+      run_on_shard { super(*args, **kwargs) }
     end
   end
 end
