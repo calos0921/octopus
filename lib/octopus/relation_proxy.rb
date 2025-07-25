@@ -16,12 +16,8 @@ module Octopus
       @ar_relation = ar_relation
     end
 
-    def respond_to?(*args, **kwargs)
-      if kwargs.empty?
-        method_missing(:respond_to?, *args)
-      else
-        method_missing(:respond_to?, *args, **kwargs)
-      end
+    def respond_to?(...)
+      method_missing(:respond_to?, ...)
     end
 
     # methods redefined in ActiveRecord that should run_on_shard

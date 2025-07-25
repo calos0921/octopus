@@ -17,12 +17,8 @@ module Octopus
         method, punctuation = [Regexp.last_match[1], Regexp.last_match[2]]
         with = :"#{method}_with_octopus#{punctuation}"
         without = :"#{method}_without_octopus#{punctuation}"
-        define_method with do |*args, **kwargs, &block|
-          if kwargs.empty?
-            run_on_shard { send(without, *args, &block) }
-          else
-            run_on_shard { send(without, *args, **kwargs, &block) }
-          end
+        define_method with do |...|
+          run_on_shard { send(without, ...) }
         end
         alias_method without.to_sym, name.to_sym
         alias_method name.to_sym, with.to_sym

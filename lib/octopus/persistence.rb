@@ -1,38 +1,38 @@
 module Octopus
   module Persistence
-    def update_attribute(*args, **kwargs)
-      run_on_shard { super(*args, **kwargs) }
+    def update_attribute(...)
+      run_on_shard { super(...) }
     end
 
     # For Rails 6.1+, update_attributes has been removed, so we alias it to update
     if defined?(ActiveRecord) && ActiveRecord::VERSION::MAJOR >= 6 && ActiveRecord::VERSION::MINOR >= 1
-      def update_attributes(*args, **kwargs)
-        run_on_shard { update(*args, **kwargs) }
+      def update_attributes(...)
+        run_on_shard { update(...) }
       end
 
-      def update_attributes!(*args, **kwargs)
-        run_on_shard { update!(*args, **kwargs) }
+      def update_attributes!(...)
+        run_on_shard { update!(...) }
       end
     else
-      def update_attributes(*args, **kwargs)
-        run_on_shard { super(*args, **kwargs) }
+      def update_attributes(...)
+        run_on_shard { super(...) }
       end
 
-      def update_attributes!(*args, **kwargs)
-        run_on_shard { super(*args, **kwargs) }
+      def update_attributes!(...)
+        run_on_shard { super(...) }
       end
     end
 
-    def update(*args, **kwargs)
-      run_on_shard { super(*args, **kwargs) }
+    def update(...)
+      run_on_shard { super(...) }
     end
 
-    def update!(*args, **kwargs)
-      run_on_shard { super(*args, **kwargs) }
+    def update!(...)
+      run_on_shard { super(...) }
     end
 
-    def reload(*args, **kwargs)
-      run_on_shard { super(*args, **kwargs) }
+    def reload(...)
+      run_on_shard { super(...) }
     end
 
     def delete
@@ -43,20 +43,20 @@ module Octopus
       run_on_shard { super }
     end
 
-    def touch(*args, **kwargs)
-      run_on_shard { super(*args, **kwargs) }
+    def touch(...)
+      run_on_shard { super(...) }
     end
 
-    def update_column(*args, **kwargs)
-      run_on_shard { super(*args, **kwargs) }
+    def update_column(...)
+      run_on_shard { super(...) }
     end
 
-    def increment!(*args, **kwargs)
-      run_on_shard { super(*args, **kwargs) }
+    def increment!(...)
+      run_on_shard { super(...) }
     end
 
-    def decrement!(*args, **kwargs)
-      run_on_shard { super(*args, **kwargs) }
+    def decrement!(...)
+      run_on_shard { super(...) }
     end
   end
 end

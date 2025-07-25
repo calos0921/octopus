@@ -1,3 +1,3 @@
 module Octopus
-  VERSION = '0.10.9'
+  VERSION = '0.10.11'
 end
