@@ -231,27 +231,19 @@ module Octopus
     # @thiagopradi - This legacy method missing logic will be keep for a while for compatibility
     # and will be removed when Octopus 1.0 will be released.
     # We are planning to migrate to a much stable logic for the Proxy that doesn't require method missing.
-    def legacy_method_missing_logic(method, *args, **kwargs, &block)
+    def legacy_method_missing_logic(method, ...)
       if should_clean_connection_proxy?(method)
         conn = select_connection
         clean_connection_proxy
-        if kwargs.empty?
-          conn.send(method, *args, &block)
-        else
-          conn.send(method, *args, **kwargs, &block)
-        end
+        conn.send(method, ...)
       elsif should_send_queries_to_shard_slave_group?(method)
-        send_queries_to_shard_slave_group(method, *args, **kwargs, &block)
+        send_queries_to_shard_slave_group(method, ...)
       elsif should_send_queries_to_slave_group?(method)
-        send_queries_to_slave_group(method, *args, **kwargs, &block)
+        send_queries_to_slave_group(method, ...)
       elsif should_send_queries_to_replicated_databases?(method)
-        send_queries_to_selected_slave(method, *args, **kwargs, &block)
+        send_queries_to_selected_slave(method, ...)
       else
-        if kwargs.empty?
-          val = select_connection.send(method, *args, &block)
-        else
-          val = select_connection.send(method, *args, **kwargs, &block)
-        end
+        val = select_connection.send(method, ...)
 
         if val.instance_of? ActiveRecord::Result
           val.current_shard = shard_name
