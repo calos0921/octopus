@@ -13,8 +13,8 @@ module Octopus
           @instrumenter.instrument(name, payload, &block)
         end
 
-        def method_missing(meth, *args, &block)
-          @instrumenter.send(meth, *args, &block)
+        def method_missing(meth, ...)
+          @instrumenter.send(meth, ...)
         end
       end
 

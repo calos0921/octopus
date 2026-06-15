@@ -1,19 +1,38 @@
 module Octopus
   module Persistence
-    def update_attribute(*args)
-      run_on_shard { super }
+    def update_attribute(...)
+      run_on_shard { super(...) }
     end
 
-    def update_attributes(*args)
-      run_on_shard { super }
+    # For Rails 6.1+, update_attributes has been removed, so we alias it to update
+    if defined?(ActiveRecord) && ActiveRecord::VERSION::MAJOR >= 6 && ActiveRecord::VERSION::MINOR >= 1
+      def update_attributes(...)
+        run_on_shard { update(...) }
+      end
+
+      def update_attributes!(...)
+        run_on_shard { update!(...) }
+      end
+    else
+      def update_attributes(...)
+        run_on_shard { super(...) }
+      end
+
+      def update_attributes!(...)
+        run_on_shard { super(...) }
+      end
     end
 
-    def update_attributes!(*args)
-      run_on_shard { super }
+    def update(...)
+      run_on_shard { super(...) }
     end
 
-    def reload(*args)
-      run_on_shard { super }
+    def update!(...)
+      run_on_shard { super(...) }
+    end
+
+    def reload(...)
+      run_on_shard { super(...) }
     end
 
     def delete
@@ -24,20 +43,20 @@ module Octopus
       run_on_shard { super }
     end
 
-    def touch(*args)
-      run_on_shard { super }
+    def touch(...)
+      run_on_shard { super(...) }
     end
 
-    def update_column(*args)
-      run_on_shard { super }
+    def update_column(...)
+      run_on_shard { super(...) }
     end
 
-    def increment!(*args)
-      run_on_shard { super }
+    def increment!(...)
+      run_on_shard { super(...) }
     end
 
-    def decrement!(*args)
-      run_on_shard { super }
+    def decrement!(...)
+      run_on_shard { super(...) }
     end
   end
 end

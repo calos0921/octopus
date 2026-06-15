@@ -27,8 +27,8 @@ module Octopus
     end
 
     # Transaction Method send all queries to a specified shard.
-    def transaction(options = {}, &block)
-      run_on_shard { klass.transaction(options, &block) }
+    def transaction(...)
+      run_on_shard { klass.transaction(...) }
     end
 
     def connection
@@ -43,8 +43,9 @@ module Octopus
       end
     end
 
-    def method_missing(method, *args, &block)
-      result = run_on_shard { @klass.__send__(method, *args, &block) }
+    def method_missing(method, ...)
+      result = run_on_shard { @klass.__send__(method, ...) }
+
       if result.respond_to?(:all)
         return ::Octopus::ScopeProxy.new(current_shard, result)
       end
